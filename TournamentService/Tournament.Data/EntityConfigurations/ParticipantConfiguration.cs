@@ -1,0 +1,30 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Tournament.Data.Entities;
+
+namespace Tournament.Data.EntityConfigurations
+{
+    public class ParticipantConfiguration : IEntityTypeConfiguration<Tournament.Data.Entities.Participant>
+    {
+        public void Configure(EntityTypeBuilder<Participant> builder)
+        {
+            builder.ToTable("participant", "dft");
+            builder.HasKey(x => x.Id);
+
+
+            builder.Property("Id").UsePropertyAccessMode(PropertyAccessMode.Property).HasColumnName("ID").IsRequired();
+
+            builder.Property("PlayerName").UsePropertyAccessMode(PropertyAccessMode.Property).HasColumnName("PLAYER_NAME").HasMaxLength(50).IsRequired();
+
+            builder.Property("PlayerSurname").UsePropertyAccessMode(PropertyAccessMode.Property).HasColumnName("PLAYER_SURNAME").HasMaxLength(50).IsRequired();
+
+            builder.Property("PlayerRating").UsePropertyAccessMode(PropertyAccessMode.Property).HasColumnName("PLAYER_RATING").HasMaxLength(5);
+
+            builder.Property("PlayerId").UsePropertyAccessMode(PropertyAccessMode.Property).HasColumnName("PLAYER_ID").IsRequired();
+
+            builder.Property("TournamentId").UsePropertyAccessMode(PropertyAccessMode.Property).HasColumnName("TOURNAMENT_ID").IsRequired();
+
+            builder.HasOne<Entities.Tournament>().WithMany().HasForeignKey("TournamentId").IsRequired();
+        }
+    }
+}
