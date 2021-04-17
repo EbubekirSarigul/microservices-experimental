@@ -11,7 +11,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using Tournament.Core.Commands;
+using Tournament.Core.Commands.CreateTournament;
+using Tournament.Core.Commands.UpdateTournament;
 using Tournament.Core.DomainEventHandlers;
 using Tournament.Core.Models;
 using Tournament.Core.Queries;
@@ -49,9 +50,12 @@ namespace TournamentService
             IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(CreateTournamentCommand)).BasedOn(typeof(IRequestHandler<,>)).WithServiceAllInterfaces().LifestyleTransient());
             IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(GetTournamentsQuery)).BasedOn(typeof(IRequestHandler<,>)).WithServiceAllInterfaces().LifestyleTransient());
             IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(NewTournamentAddedDomainEventHandler)).BasedOn(typeof(INotificationHandler<>)).LifestyleTransient());
+            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(TournamentDateChangedDomainEventHandler)).BasedOn(typeof(INotificationHandler<>)).LifestyleTransient());
+            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(TournamentEntryPriceChangedDomainEventHandler)).BasedOn(typeof(INotificationHandler<>)).LifestyleTransient());
 
             services.AddScoped<ITournamentRepository, TournamentRepository>();
             services.AddTransient<IValidator<CreateTournamentCommand>, CreateTournamentCommandValidation>();
+            services.AddTransient<IValidator<UpdateTournamentCommand>, UpdateTournamentCommandValidation>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

@@ -1,6 +1,7 @@
 ﻿using MicroserviceTraining.Framework.Data.Interface;
 using MicroserviceTraining.Framework.ExceptionMiddleware;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -39,9 +40,15 @@ namespace Tournament.Data.Repositories
             }
         }
 
-        public async Task<Entities.Tournament> GetTournament(string name)
+        public void UpdateTournament(Entities.Tournament tournament)
         {
-            var result = await _tournamentContext.Tournament.Where(x => x.Name == name).SingleOrDefaultAsync();
+            _tournamentContext.Entry(tournament).State = EntityState.Modified;
+        }
+
+        public Entities.Tournament GetTournament(Guid id)
+        {
+            var result = _tournamentContext.Tournament.SingleOrDefault(x => x.Id == id);
+
             return result;
         }
 

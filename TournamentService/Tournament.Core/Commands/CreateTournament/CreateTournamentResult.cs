@@ -1,7 +1,7 @@
 ﻿using MicroserviceTraining.Framework.Models;
 using System;
 
-namespace Tournament.Core.Commands
+namespace Tournament.Core.Commands.CreateTournament
 {
     public class CreateTournamentResult : BaseResult
     {

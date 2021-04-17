@@ -1,8 +1,8 @@
 ﻿using MicroserviceTraining.Framework.Commands;
 
-namespace Tournament.Core.Commands
+namespace Tournament.Core.Commands.CreateTournament
 {
-    public class CreateTournamentCommand : BaseCommand<CreateTournamentResult> 
+    public class CreateTournamentCommand : BaseCommand<CreateTournamentResult>
     {
         public string Name { get; set; }
 

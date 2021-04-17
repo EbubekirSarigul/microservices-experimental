@@ -2,7 +2,7 @@
 using System;
 using System.Globalization;
 
-namespace Tournament.Core.Commands
+namespace Tournament.Core.Commands.CreateTournament
 {
     public class CreateTournamentCommandValidation: AbstractValidator<CreateTournamentCommand>
     {

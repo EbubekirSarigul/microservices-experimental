@@ -1,4 +1,5 @@
 ﻿using MicroserviceTraining.Framework.Data.Interface;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Entity = Tournament.Data.Entities;
@@ -9,8 +10,12 @@ namespace Tournament.Data.Repositories
     {
         Task<Entities.Tournament> AddTournament(Entity.Tournament tournament);
 
-        Task<Entities.Tournament> GetTournament(string name);
+        void UpdateTournament(Entities.Tournament tournament);
+
+        Entities.Tournament GetTournament(Guid id);
 
         Task<ICollection<Entities.Tournament>> GetTournaments();
+
+
     }
 }
