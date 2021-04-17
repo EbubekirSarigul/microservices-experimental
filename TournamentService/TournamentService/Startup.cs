@@ -13,6 +13,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Tournament.Core.Commands;
 using Tournament.Core.DomainEventHandlers;
+using Tournament.Core.Models;
+using Tournament.Core.Queries;
 using Tournament.Data.Context;
 using Tournament.Data.Repositories;
 
@@ -41,9 +43,11 @@ namespace TournamentService
 
             IocFacility.Container
                             .AddMediaTR()
-                            .AddKafka(Configuration);
+                            .AddKafka(Configuration)
+                            .AddAutoMapper(typeof(TournamentModel).Assembly);
 
             IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(CreateTournamentCommand)).BasedOn(typeof(IRequestHandler<,>)).WithServiceAllInterfaces().LifestyleTransient());
+            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(GetTournamentsQuery)).BasedOn(typeof(IRequestHandler<,>)).WithServiceAllInterfaces().LifestyleTransient());
             IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(NewTournamentAddedDomainEventHandler)).BasedOn(typeof(INotificationHandler<>)).LifestyleTransient());
 
             services.AddScoped<ITournamentRepository, TournamentRepository>();

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Tournament.Core.Commands;
+using Tournament.Core.Queries;
 
 namespace TournamentService.Controllers
 {
@@ -20,6 +21,12 @@ namespace TournamentService.Controllers
         public async Task<ActionResult<CreateTournamentResult>> CreateTournament([FromBody] CreateTournamentCommand createTournamentCommand)
         {
             return await _mediator.Send(createTournamentCommand);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<GetTournamentsResult>> GetTournaments([FromQuery] GetTournamentsQuery getTournamentsQuery)
+        {
+            return await _mediator.Send(getTournamentsQuery);
         }
     }
 }

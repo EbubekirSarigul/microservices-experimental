@@ -1,7 +1,7 @@
 ﻿using MicroserviceTraining.Framework.Data.Interface;
-using MicroserviceTraining.Framework.Enum;
 using MicroserviceTraining.Framework.ExceptionMiddleware;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Tournament.Data.Context;
@@ -35,13 +35,19 @@ namespace Tournament.Data.Repositories
             }
             else
             {
-                throw new BusinessException(ErrorCodes.TOURNAMENT_ALREADY_EXISTS.Value, "A tournament with the same name is already exists.", System.Net.HttpStatusCode.BadRequest);
+                throw new BusinessException("TOURNAMENT_ALREADY_EXISTS", "A tournament with the same name is already exists.", System.Net.HttpStatusCode.BadRequest);
             }
         }
 
         public async Task<Entities.Tournament> GetTournament(string name)
         {
             var result = await _tournamentContext.Tournament.Where(x => x.Name == name).SingleOrDefaultAsync();
+            return result;
+        }
+
+        public async Task<ICollection<Entities.Tournament>> GetTournaments()
+        {
+            var result = await _tournamentContext.Tournament.ToListAsync();
             return result;
         }
     }

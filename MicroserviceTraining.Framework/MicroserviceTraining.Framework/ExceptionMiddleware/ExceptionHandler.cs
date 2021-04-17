@@ -1,6 +1,4 @@
-﻿using MicroserviceTraining.Framework.Constants;
-using MicroserviceTraining.Framework.Enum;
-using MicroserviceTraining.Framework.Extensions;
+﻿using MicroserviceTraining.Framework.Extensions;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Net;
@@ -26,16 +24,16 @@ namespace MicroserviceTraining.Framework.ExceptionMiddleware
             catch (BusinessException businessException)
             {
                 var exception = CreateExceptionModel(businessException._errorCode, businessException._errorMessage);
-                await WriteException(httpContext, exception);
+                await WriteException(httpContext, exception, httpStatusCode: businessException._statusCode);
             }
             catch (InputException validationException)
             {
                 var exception = CreateExceptionModel(validationException);
-                await WriteException(httpContext, exception);
+                await WriteException(httpContext, exception, HttpStatusCode.BadRequest);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                var exception = CreateExceptionModel(ErrorCodes.SERVER_ERROR.Value, "Unknown error");
+                var exception = CreateExceptionModel("SERVER_ERROR", "Unknown error");
                 await WriteException(httpContext, exception);
             }
         }
@@ -55,16 +53,16 @@ namespace MicroserviceTraining.Framework.ExceptionMiddleware
             var exception = new ExceptionModel
             {
                 IncludeValidationErrors = true,
-                ErrorCode = ErrorCodes.VALIDATION_ERROR.Value,
+                ErrorCode = "VALIDATION_ERROR",
                 ErrorMessage = "Details in validation errors",
                 ValidationErrors = validationException._validationErrors
             };
             return exception.ToJson();
         }
 
-        private async Task WriteException(HttpContext httpContext, string exception)
+        private async Task WriteException(HttpContext httpContext, string exception, HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError)
         {
-            httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            httpContext.Response.StatusCode = (int)httpStatusCode;
             httpContext.Response.ContentType = "application/json"; // todo: accept
             await httpContext.Response.WriteAsync(exception);
         }

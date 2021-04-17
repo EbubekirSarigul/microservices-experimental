@@ -1,4 +1,5 @@
-﻿using Castle.MicroKernel.Registration;
+﻿using AutoMapper;
+using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.Resolvers.SpecializedResolvers;
 using Castle.Windsor;
 using Castle.Windsor.MsDependencyInjection;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace MicroserviceTraining.Framework.ConfigurationExtensions
 {
@@ -66,6 +68,23 @@ namespace MicroserviceTraining.Framework.ConfigurationExtensions
             applicationBuilder.UseMiddleware<ExceptionHandler>();
 
             return applicationBuilder;
+        }
+
+        public static IWindsorContainer AddAutoMapper(this IWindsorContainer container, Assembly assembly)
+        {
+            container.Register(Classes.FromAssemblyInThisApplication(assembly).BasedOn<Profile>().WithServiceBase());
+            container.Register(Component.For<IConfigurationProvider>().UsingFactoryMethod(kernel =>
+            {
+                return new MapperConfiguration(configuration =>
+                {
+                    kernel.ResolveAll<Profile>().ToList().ForEach(configuration.AddProfile);
+                });
+            }).LifestyleSingleton());
+
+            container.Register(
+                Component.For<IMapper>().UsingFactoryMethod(kernel =>
+                    new Mapper(kernel.Resolve<IConfigurationProvider>(), kernel.Resolve)));
+            return container;
         }
     }
 }
