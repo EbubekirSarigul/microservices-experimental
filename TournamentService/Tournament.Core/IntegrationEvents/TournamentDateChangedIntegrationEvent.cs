@@ -1,17 +1,17 @@
-﻿using MediatR;
+﻿using MicroserviceTraining.Framework.IntegrationEvents.Abstractions;
 using System;
 using System.Collections.Generic;
 
-namespace Tournament.Data.Events
+namespace Tournament.Core.IntegrationEvents
 {
-    public class TournamentDateChangedDomainEvent : INotification
+    public class TournamentDateChangedIntegrationEvent : IntegrationEvent
     {
         public string Name { get; }
         public string Date { get; }
 
         public IEnumerable<Guid> PlayerList { get; }
 
-        public TournamentDateChangedDomainEvent(string name, string date, IEnumerable<Guid> playerList)
+        public TournamentDateChangedIntegrationEvent(string name, string date, IEnumerable<Guid> playerList)
         {
             Name = name;
             Date = date;

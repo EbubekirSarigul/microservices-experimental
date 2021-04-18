@@ -29,5 +29,10 @@ namespace Player.Data.Repositories
         {
             return await _playerContext.Players.Where(x => x.Rating >= minRating).ToListAsync();
         }
+
+        public async Task<ICollection<Entities.Player>> GetPlayersByIdList(IEnumerable<Guid> playerIds)
+        {
+            return await _playerContext.Players.Where(x => playerIds.Contains(x.Id)).ToListAsync();
+        }
     }
 }

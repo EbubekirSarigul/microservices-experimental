@@ -3,6 +3,7 @@ using MicroserviceTraining.Framework.IntegrationEvents.Abstractions;
 using MicroserviceTraining.Framework.IOC;
 using Microsoft.Extensions.Hosting;
 using Player.Core.IntegrationEventHandlers.NewTournamentAdded;
+using Player.Core.IntegrationEventHandlers.TournamentDateChanged;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,6 +18,7 @@ namespace Player.Core.BackgroundServices
             await Task.Yield(); // note : a new thread could also be used instead of Task.Yield(); OR completele different project(A Worker Service for example)
 
             _eventBus.Subscribe<NewTournamentAddedIntegrationEvent>(Constant.EventTopic_TournamentAdded);
+            _eventBus.Subscribe<TournamentDateChangedIntegrationEvent>(Constant.EventTopic_TournamentDateChanged);
 
             await _eventBus.StartConsuming(stoppingToken);
         }

@@ -7,6 +7,8 @@
         public const string IntegrationEventPrefix = "INTEGRATION_EVENT_";
 
         public const string EventTopic_TournamentAdded = "NewTournamentAdded";
+        public const string EventTopic_TournamentDateChanged = "TournamentDateChanged";
+        public const string EventTopic_TournamentPriceChanged = "TournamentPriceChanged";
 
         public const int MinRatingForTournamentInforming = 2000;
     }

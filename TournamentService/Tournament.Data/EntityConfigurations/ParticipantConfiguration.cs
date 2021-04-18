@@ -22,9 +22,8 @@ namespace Tournament.Data.EntityConfigurations
 
             builder.Property("PlayerId").UsePropertyAccessMode(PropertyAccessMode.Property).HasColumnName("PLAYER_ID").IsRequired();
 
-            builder.Property("TournamentId").UsePropertyAccessMode(PropertyAccessMode.Property).HasColumnName("TOURNAMENT_ID").IsRequired();
-
-            builder.HasOne<Entities.Tournament>().WithMany().HasForeignKey("TournamentId").IsRequired();
+            builder.HasOne(x => x.Tournament).WithMany(x => x.Participants).HasForeignKey(x => x.TournamentId);
+            builder.Property(x => x.TournamentId).UsePropertyAccessMode(PropertyAccessMode.Property).HasColumnName("TOURNAMENT_ID");
         }
     }
 }

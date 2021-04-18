@@ -45,9 +45,14 @@ namespace Tournament.Data.Repositories
             _tournamentContext.Entry(tournament).State = EntityState.Modified;
         }
 
-        public Entities.Tournament GetTournament(Guid id)
+        public async Task<Entities.Tournament> GetTournament(Guid id)
         {
-            var result = _tournamentContext.Tournament.SingleOrDefault(x => x.Id == id);
+            var result = await _tournamentContext.Tournament.SingleOrDefaultAsync(x => x.Id == id);
+
+            if (result != null)
+            {
+                await _tournamentContext.Entry(result).Collection(x => x.Participants).LoadAsync();
+            }
 
             return result;
         }

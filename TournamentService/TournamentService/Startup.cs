@@ -37,7 +37,7 @@ namespace TournamentService
 
             var dbContextOptions = new DbContextOptionsBuilder<TournamentContext>()
                                                                 .UseMySql(connString, ServerVersion.AutoDetect(connString))
-                                                                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking).Options;
+                                                                .UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll).Options;
 
             IocFacility.Container.Register(Component.For<TournamentContext>().LifestyleTransient());
             IocFacility.Container.Register(Component.For(typeof(DbContextOptions<TournamentContext>)).Instance(dbContextOptions).LifestyleSingleton());

@@ -25,8 +25,6 @@ namespace Tournament.Data.EntityConfigurations
 
             var navigation = builder.Metadata.FindNavigation(nameof(Tournament.Data.Entities.Tournament.Participants));
             navigation.SetPropertyAccessMode(PropertyAccessMode.Field);
-
-            builder.HasMany<Entities.Participant>().WithOne().HasForeignKey("TournamentId").IsRequired(false);
         }
     }
 }

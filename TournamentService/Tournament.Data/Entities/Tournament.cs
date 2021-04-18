@@ -1,5 +1,6 @@
 ﻿using MicroserviceTraining.Framework.Data;
 using System.Collections.Generic;
+using System.Linq;
 using Tournament.Data.Events;
 
 namespace Tournament.Data.Entities
@@ -16,6 +17,7 @@ namespace Tournament.Data.Entities
             Date = date;
             EntryPrice = entryPrice;
             Address = address;
+            _participants = new List<Participant>();
             AddDomainEvent(new NewTournamentAddedDomainEvent(Name, Date, entryPrice, address));
         }
 
@@ -28,7 +30,7 @@ namespace Tournament.Data.Entities
         public string Address { get; private set; }
 
         // DDD: Participant cannot be added "outside of the aggregate root which is tournament"
-        private List<Participant> _participants { get; set; } = new List<Participant>();
+        private readonly List<Participant> _participants;
 
         public IReadOnlyCollection<Participant> Participants => _participants;
 
@@ -46,7 +48,8 @@ namespace Tournament.Data.Entities
         {
             if (date != Date)
             {
-                AddDomainEvent(new TournamentDateChangedDomainEvent(Name, date));
+                var playerList = Participants.Select(x => x.Id);
+                AddDomainEvent(new TournamentDateChangedDomainEvent(Name, date, playerList));
             }
 
             Date = date;

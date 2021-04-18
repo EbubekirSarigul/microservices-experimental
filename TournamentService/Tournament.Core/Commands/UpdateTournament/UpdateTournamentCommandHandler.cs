@@ -19,7 +19,7 @@ namespace Tournament.Core.Commands.UpdateTournament
 
         public async Task<UpdateTournamentResult> Handle(UpdateTournamentCommand request, CancellationToken cancellationToken)
         {
-            var tournament = _tournamentRepository.GetTournament(Guid.Parse(request.Id));
+            var tournament = await _tournamentRepository.GetTournament(Guid.Parse(request.Id));
 
             if(tournament == null)
             {
@@ -28,8 +28,6 @@ namespace Tournament.Core.Commands.UpdateTournament
 
             tournament.SetDate(request.Date);
             tournament.SetPrice(request.EntryPrice);
-
-            _tournamentRepository.UpdateTournament(tournament);
 
             await _tournamentRepository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
 

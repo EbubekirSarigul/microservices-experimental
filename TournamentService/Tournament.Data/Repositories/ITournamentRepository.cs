@@ -12,7 +12,7 @@ namespace Tournament.Data.Repositories
 
         void UpdateTournament(Entities.Tournament tournament);
 
-        Entities.Tournament GetTournament(Guid id);
+        Task<Entities.Tournament> GetTournament(Guid id);
 
         Task<ICollection<Entities.Tournament>> GetTournaments();
 

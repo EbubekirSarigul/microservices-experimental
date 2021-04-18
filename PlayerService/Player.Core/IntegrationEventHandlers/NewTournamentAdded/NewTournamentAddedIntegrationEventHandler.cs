@@ -2,8 +2,6 @@
 using MicroserviceTraining.Framework.Constants;
 using MicroserviceTraining.Framework.Sms.Abstractions;
 using Player.Data.Repositories;
-using System;
-using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 
