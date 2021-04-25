@@ -6,11 +6,14 @@ using Castle.Windsor.MsDependencyInjection;
 using FluentValidation;
 using MediatR;
 using MicroserviceTraining.Framework.Behaviors;
+using MicroserviceTraining.Framework.Cache;
+using MicroserviceTraining.Framework.Cache.Abstraction;
 using MicroserviceTraining.Framework.Commands;
 using MicroserviceTraining.Framework.ExceptionMiddleware;
 using MicroserviceTraining.Framework.IOC;
 using MicroserviceTraining.Framework.IOC.Filters;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Collections.Generic;
@@ -73,7 +76,7 @@ namespace MicroserviceTraining.Framework.ConfigurationExtensions
         public static IWindsorContainer AddAutoMapper(this IWindsorContainer container, Assembly assembly)
         {
             container.Register(Classes.FromAssemblyInThisApplication(assembly).BasedOn<Profile>().WithServiceBase());
-            container.Register(Component.For<IConfigurationProvider>().UsingFactoryMethod(kernel =>
+            container.Register(Component.For<AutoMapper.IConfigurationProvider>().UsingFactoryMethod(kernel =>
             {
                 return new MapperConfiguration(configuration =>
                 {
@@ -83,7 +86,18 @@ namespace MicroserviceTraining.Framework.ConfigurationExtensions
 
             container.Register(
                 Component.For<IMapper>().UsingFactoryMethod(kernel =>
-                    new Mapper(kernel.Resolve<IConfigurationProvider>(), kernel.Resolve)));
+                    new Mapper(kernel.Resolve<AutoMapper.IConfigurationProvider>(), kernel.Resolve)));
+            return container;
+        }
+
+        public static IWindsorContainer AddRedis(this IWindsorContainer container, IConfiguration configuration)
+        {
+            RedisSettings redisSettings = new RedisSettings();
+
+            configuration.GetSection("RedisSettings").Bind(redisSettings);
+
+            container.Register(Component.For<ICacheProvider>().ImplementedBy<RedisCacheProvider>().LifestyleSingleton());
+
             return container;
         }
     }

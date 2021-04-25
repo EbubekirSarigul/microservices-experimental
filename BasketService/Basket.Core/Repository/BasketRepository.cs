@@ -1,4 +1,5 @@
 ﻿using Basket.Core.Models;
+using MicroserviceTraining.Framework.Cache.Abstraction;
 using MicroserviceTraining.Framework.Extensions;
 using StackExchange.Redis;
 using System.Threading.Tasks;
@@ -7,16 +8,16 @@ namespace Basket.Core.Repository
 {
     public class BasketRepository : IBasketRepository
     {
-        private readonly IDatabase _database;
+        private readonly ICacheProvider _cacheProvider;
 
-        public BasketRepository(ConnectionMultiplexer redis)
+        public BasketRepository(ICacheProvider cacheProvider)
         {
-            _database = redis.GetDatabase();
+            _cacheProvider = cacheProvider;
         }
 
         public async Task<PlayerBasket> AddToBasket(string playerId, Tournament tournament)
         {
-            var basket = await GetBasket(playerId);
+            var basket = await _cacheProvider.GetItem<PlayerBasket>(playerId);
 
             if (basket == default(PlayerBasket))
             {
@@ -24,21 +25,14 @@ namespace Basket.Core.Repository
             }
 
             basket.AddItem(tournament);
-            await _database.StringSetAsync(playerId, basket.ToJson());
+            await _cacheProvider.AddItem(playerId, basket);
 
-            return await GetBasket(playerId);
+            return await _cacheProvider.GetItem<PlayerBasket>(playerId);
         }
 
         public async Task<PlayerBasket> GetBasket(string playerId)
         {
-            var item = await _database.StringGetAsync(playerId);
-
-            if(item.IsNullOrEmpty)
-            {
-                return default(PlayerBasket);
-            }
-
-            return item.ToString().Deserialize<PlayerBasket>();
+            return await _cacheProvider.GetItem<PlayerBasket>(playerId);
         }
     }
 }

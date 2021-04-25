@@ -18,7 +18,7 @@ namespace BasketService.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<PlayerBasket>> AddItem([FromBody] AddItemCommand addItemCommand)
+        public async Task<ActionResult<AddItemResult>> AddItem([FromBody] AddItemCommand addItemCommand)
         {
             return await _mediator.Send(addItemCommand);
         }

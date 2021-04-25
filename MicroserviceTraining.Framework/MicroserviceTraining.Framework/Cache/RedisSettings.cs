@@ -1,4 +1,4 @@
-﻿namespace Basket.Core.Settings
+﻿namespace MicroserviceTraining.Framework.Cache
 {
     public class RedisSettings
     {
