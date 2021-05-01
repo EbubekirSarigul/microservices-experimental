@@ -6,16 +6,16 @@ using Castle.Windsor.MsDependencyInjection;
 using FluentValidation;
 using MediatR;
 using MicroserviceTraining.Framework.Behaviors;
-using MicroserviceTraining.Framework.Cache;
-using MicroserviceTraining.Framework.Cache.Abstraction;
 using MicroserviceTraining.Framework.Commands;
 using MicroserviceTraining.Framework.ExceptionMiddleware;
 using MicroserviceTraining.Framework.IOC;
 using MicroserviceTraining.Framework.IOC.Filters;
+using MicroserviceTraining.Framework.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using StackExchange.Redis;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -90,15 +90,17 @@ namespace MicroserviceTraining.Framework.ConfigurationExtensions
             return container;
         }
 
-        public static IWindsorContainer AddRedis(this IWindsorContainer container, IConfiguration configuration)
+        public static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration configuration)
         {
-            RedisSettings redisSettings = new RedisSettings();
+            services.AddStackExchangeRedisCache(options =>
+            {
+                RedisSettings redisSettings = new RedisSettings();
+                configuration.GetSection("RedisSettings").Bind(redisSettings);
+                var configurationOptions = ConfigurationOptions.Parse(redisSettings.ConnectionString, true);
+                options.ConfigurationOptions = configurationOptions;
+            });
 
-            configuration.GetSection("RedisSettings").Bind(redisSettings);
-
-            container.Register(Component.For<ICacheProvider>().ImplementedBy<RedisCacheProvider>().LifestyleSingleton());
-
-            return container;
+            return services;
         }
     }
 }

@@ -11,6 +11,7 @@ using Basket.Core.Commands.AddItem;
 using MediatR;
 using Basket.Core.Repository;
 using FluentValidation;
+using StackExchange.Redis;
 
 namespace BasketService
 {
@@ -27,14 +28,14 @@ namespace BasketService
         public void ConfigureServices(IServiceCollection services)
         {
             IocFacility.Container
-                            .AddMediaTR()
-                            .AddRedis(Configuration);
+                            .AddMediaTR();
 
             IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(AddItemCommand)).BasedOn(typeof(IRequestHandler<,>)).WithServiceAllInterfaces().LifestyleTransient());
-
             IocFacility.Container.Register(Component.For<IBasketRepository>().ImplementedBy<BasketRepository>().LifestyleTransient());
 
+            services.AddRedis(Configuration);
             services.AddTransient<IValidator<AddItemCommand>, AddItemCommandValidation>();
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

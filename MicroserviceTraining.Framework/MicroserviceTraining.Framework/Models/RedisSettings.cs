@@ -1,4 +1,4 @@
-﻿namespace MicroserviceTraining.Framework.Cache
+﻿namespace MicroserviceTraining.Framework.Models
 {
     public class RedisSettings
     {

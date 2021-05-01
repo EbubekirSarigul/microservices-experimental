@@ -1,38 +1,45 @@
 ﻿using Basket.Core.Models;
-using MicroserviceTraining.Framework.Cache.Abstraction;
 using MicroserviceTraining.Framework.Extensions;
-using StackExchange.Redis;
+using Microsoft.Extensions.Caching.Distributed;
+using System;
 using System.Threading.Tasks;
 
 namespace Basket.Core.Repository
 {
     public class BasketRepository : IBasketRepository
     {
-        private readonly ICacheProvider _cacheProvider;
+        private readonly IDistributedCache _cache;
 
-        public BasketRepository(ICacheProvider cacheProvider)
+        public BasketRepository(IDistributedCache cache)
         {
-            _cacheProvider = cacheProvider;
+            _cache = cache;
         }
 
         public async Task<PlayerBasket> AddToBasket(string playerId, Tournament tournament)
         {
-            var basket = await _cacheProvider.GetItem<PlayerBasket>(playerId);
+            var basket = new PlayerBasket();
 
-            if (basket == default(PlayerBasket))
+            var item = await _cache.GetStringAsync(playerId);
+
+            if(!string.IsNullOrEmpty(item))
             {
-                basket = new PlayerBasket();
+                basket = item.Deserialize<PlayerBasket>();
             }
 
             basket.AddItem(tournament);
-            await _cacheProvider.AddItem(playerId, basket);
 
-            return await _cacheProvider.GetItem<PlayerBasket>(playerId);
+            await _cache.SetStringAsync(playerId, basket.ToJson(), new DistributedCacheEntryOptions()
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
+            });
+
+            return (await _cache.GetStringAsync(playerId)).Deserialize<PlayerBasket>();
         }
 
         public async Task<PlayerBasket> GetBasket(string playerId)
         {
-            return await _cacheProvider.GetItem<PlayerBasket>(playerId);
+            var basket = await _cache.GetStringAsync(playerId);
+            return basket.Deserialize<PlayerBasket>();
         }
     }
 }
