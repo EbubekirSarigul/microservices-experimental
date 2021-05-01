@@ -8,5 +8,7 @@ namespace Basket.Core.Repository
         Task<PlayerBasket> AddToBasket(string playerId, Tournament tournament);
 
         Task<PlayerBasket> GetBasket(string playerId);
+
+        Task DeleteBasket(string playerId);
     }
 }

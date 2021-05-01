@@ -21,7 +21,7 @@ namespace Basket.Core.Repository
 
             var item = await _cache.GetStringAsync(playerId);
 
-            if(!string.IsNullOrEmpty(item))
+            if (!string.IsNullOrEmpty(item))
             {
                 basket = item.Deserialize<PlayerBasket>();
             }
@@ -36,10 +36,26 @@ namespace Basket.Core.Repository
             return (await _cache.GetStringAsync(playerId)).Deserialize<PlayerBasket>();
         }
 
+        public async Task DeleteBasket(string playerId)
+        {
+            var basket = await _cache.GetStringAsync(playerId);
+            if (!string.IsNullOrEmpty(basket))
+            {
+                await _cache.RemoveAsync(playerId);
+            }
+        }
+
         public async Task<PlayerBasket> GetBasket(string playerId)
         {
             var basket = await _cache.GetStringAsync(playerId);
-            return basket.Deserialize<PlayerBasket>();
+            if (basket != null)
+            {
+                return basket.Deserialize<PlayerBasket>();
+            }
+            else
+            {
+                return default(PlayerBasket);
+            }
         }
     }
 }
