@@ -1,3 +1,7 @@
+using Castle.MicroKernel.Registration;
+using MediatR;
+using MicroserviceTraining.Framework.ConfigurationExtensions;
+using MicroserviceTraining.Framework.IntegrationEvents.ConfigurationExtensions;
 using MicroserviceTraining.Framework.IOC;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -5,17 +9,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using MicroserviceTraining.Framework.ConfigurationExtensions;
-using Castle.MicroKernel.Registration;
-using Basket.Core.Commands.AddItem;
-using MediatR;
-using Basket.Core.Repository;
-using FluentValidation;
-using StackExchange.Redis;
-using MicroserviceTraining.Framework.IntegrationEvents.ConfigurationExtensions;
-using Basket.Core.Commands.Checkout;
+using Payment.Core.BackgroundServices;
+using Payment.Core.IntegrationEventHandlers;
 
-namespace BasketService
+namespace PaymentService
 {
     public class Startup
     {
@@ -30,21 +27,17 @@ namespace BasketService
         public void ConfigureServices(IServiceCollection services)
         {
             IocFacility.Container
-                .AddKafka(Configuration)
-                .AddMediaTR();
+                .AddMediaTR()
+                .AddKafka(Configuration);
 
-            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(AddItemCommand)).BasedOn(typeof(IRequestHandler<,>)).WithServiceAllInterfaces().LifestyleTransient());
-            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(CheckoutCommand)).BasedOn(typeof(IRequestHandler<,>)).WithServiceAllInterfaces().LifestyleTransient());
-            IocFacility.Container.Register(Component.For<IBasketRepository>().ImplementedBy<BasketRepository>().LifestyleTransient());
+            services.AddHostedService<EventConsumerService>();
 
-            services.AddRedis(Configuration);
-            services.AddTransient<IValidator<AddItemCommand>, AddItemCommandValidation>();
-            services.AddTransient<IValidator<CheckoutCommand>, CheckoutCommandValidation>();
+            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(CheckoutIntegrationEventHandler)).BasedOn(typeof(INotificationHandler<>)).LifestyleTransient());
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "BasketService", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "PaymentService", Version = "v1" });
             });
 
             services.AddWindsor();
@@ -57,7 +50,7 @@ namespace BasketService
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BasketService v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PaymentService v1"));
             }
 
             app.ConfigureAll();

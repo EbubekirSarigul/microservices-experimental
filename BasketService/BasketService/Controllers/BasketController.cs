@@ -1,4 +1,5 @@
 ﻿using Basket.Core.Commands.AddItem;
+using Basket.Core.Commands.Checkout;
 using Basket.Core.Models;
 using Basket.Core.Repository;
 using MediatR;
@@ -45,6 +46,13 @@ namespace BasketService.Controllers
             }
 
             return Ok(basket);
+        }
+
+        [Route("checkout")]
+        [HttpPost]
+        public async Task<ActionResult<CheckoutResult>> Checkout([FromBody] CheckoutCommand checkoutCommand)
+        {
+            return await _mediator.Send(checkoutCommand);
         }
     }
 }

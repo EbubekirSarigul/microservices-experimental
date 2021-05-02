@@ -15,7 +15,7 @@ namespace Player.Core.IntegrationEventHandlers.TournamentDateChanged
 
         public override string ToString()
         {
-            return String.Format("Tournament data changed information!!\n Tournament name: {0}, New Date: {1}",
+            return String.Format("Tournament date changed!!\n Tournament name: {0}, New Date: {1}",
                 Name, DateTime.ParseExact(Date, "yyyyMMdd", CultureInfo.InvariantCulture).Date);
         }
     }

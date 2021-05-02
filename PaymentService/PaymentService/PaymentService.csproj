@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <UserSecretsId>9295132c-523d-4050-bf42-7bc4cc9cafda</UserSecretsId>
+    <UserSecretsId>0653b1cc-3514-44f1-aa5f-6a5496405034</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
@@ -12,18 +12,19 @@
     <PackageReference Include="Castle.Windsor.MsDependencyInjection" Version="3.4.0" />
     <PackageReference Include="Confluent.Kafka" Version="1.6.3" />
     <PackageReference Include="Ebubekir.MicroserviceTraining.Framework" Version="1.0.2" />
-    <PackageReference Include="FluentValidation.AspNetCore" Version="9.5.2" />
-    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="9.5.2" />
-    <PackageReference Include="MediatR" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="5.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="9.5.3" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="9.5.3" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Basket.Core\Basket.Core.csproj" />
+    <Folder Include="Controllers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Payment.Core\Payment.Core.csproj" />
   </ItemGroup>
 
 </Project>
