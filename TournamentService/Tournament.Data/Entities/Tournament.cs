@@ -1,4 +1,5 @@
 ﻿using MicroserviceTraining.Framework.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Tournament.Data.Events;
@@ -53,6 +54,12 @@ namespace Tournament.Data.Entities
             }
 
             Date = date;
+        }
+        
+        public void AddParticipant(Guid playerId)
+        {
+            var participant = new Participant(playerId);
+            _participants.Add(participant);
         }
     }
 }

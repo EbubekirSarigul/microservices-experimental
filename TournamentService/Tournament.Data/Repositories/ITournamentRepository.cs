@@ -16,6 +16,6 @@ namespace Tournament.Data.Repositories
 
         Task<ICollection<Entities.Tournament>> GetTournaments();
 
-
+        Task<List<Entities.Tournament>> GetTournaments(List<Guid> ids);
     }
 }

@@ -14,12 +14,6 @@ namespace Tournament.Data.EntityConfigurations
 
             builder.Property("Id").UsePropertyAccessMode(PropertyAccessMode.Property).HasColumnName("ID").IsRequired();
 
-            builder.Property("PlayerName").UsePropertyAccessMode(PropertyAccessMode.Property).HasColumnName("PLAYER_NAME").HasMaxLength(50).IsRequired();
-
-            builder.Property("PlayerSurname").UsePropertyAccessMode(PropertyAccessMode.Property).HasColumnName("PLAYER_SURNAME").HasMaxLength(50).IsRequired();
-
-            builder.Property("PlayerRating").UsePropertyAccessMode(PropertyAccessMode.Property).HasColumnName("PLAYER_RATING").HasMaxLength(5);
-
             builder.Property("PlayerId").UsePropertyAccessMode(PropertyAccessMode.Property).HasColumnName("PLAYER_ID").IsRequired();
 
             builder.HasOne(x => x.Tournament).WithMany(x => x.Participants).HasForeignKey(x => x.TournamentId);

@@ -8,7 +8,7 @@ namespace Payment.Core.IntegrationEvents
     {
         public Guid PlayerId { get; }
 
-        public List<Guid> Tournaments { get; set; }
+        public List<Guid> Tournaments { get; }
 
         public PaymentCompletedIntegrationEvent(Guid playerId, List<Guid> tournaments)
         {

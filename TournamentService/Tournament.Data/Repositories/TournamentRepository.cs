@@ -42,7 +42,7 @@ namespace Tournament.Data.Repositories
 
         public void UpdateTournament(Entities.Tournament tournament)
         {
-            _tournamentContext.Entry(tournament).State = EntityState.Modified;
+            _tournamentContext.Update(tournament);
         }
 
         public async Task<Entities.Tournament> GetTournament(Guid id)
@@ -60,6 +60,12 @@ namespace Tournament.Data.Repositories
         public async Task<ICollection<Entities.Tournament>> GetTournaments()
         {
             var result = await _tournamentContext.Tournament.ToListAsync();
+            return result;
+        }
+
+        public async Task<List<Entities.Tournament>> GetTournaments(List<Guid> ids)
+        {
+            var result = await _tournamentContext.Tournament.Include(x => x.Participants).Where(x => ids.Contains(x.Id)).ToListAsync();
             return result;
         }
     }
