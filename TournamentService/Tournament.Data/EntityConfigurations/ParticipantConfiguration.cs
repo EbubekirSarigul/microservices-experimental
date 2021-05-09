@@ -11,8 +11,7 @@ namespace Tournament.Data.EntityConfigurations
             builder.ToTable("participant", "dft");
             builder.HasKey(x => x.Id);
 
-
-            builder.Property("Id").UsePropertyAccessMode(PropertyAccessMode.Property).HasColumnName("ID").IsRequired();
+            builder.Property("Id").UsePropertyAccessMode(PropertyAccessMode.Property).ValueGeneratedNever().HasColumnName("ID").IsRequired();
 
             builder.Property("PlayerId").UsePropertyAccessMode(PropertyAccessMode.Property).HasColumnName("PLAYER_ID").IsRequired();
 

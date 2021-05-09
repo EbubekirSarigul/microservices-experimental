@@ -5,9 +5,10 @@ namespace Tournament.Data.Entities
 {
     public class Participant : Entity
     {
-        public Participant(Guid playerId)
+        public Participant(Guid playerId, Guid tournamentId)
         {
             PlayerId = playerId;
+            TournamentId = tournamentId;
         }
 
         public Guid TournamentId { get; set; }

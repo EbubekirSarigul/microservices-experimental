@@ -58,7 +58,7 @@ namespace Tournament.Data.Entities
         
         public void AddParticipant(Guid playerId)
         {
-            var participant = new Participant(playerId);
+            var participant = new Participant(playerId, Id);
             _participants.Add(participant);
         }
     }

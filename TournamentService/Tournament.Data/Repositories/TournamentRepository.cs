@@ -43,23 +43,19 @@ namespace Tournament.Data.Repositories
         public void UpdateTournament(Entities.Tournament tournament)
         {
             _tournamentContext.Update(tournament);
+
         }
 
         public async Task<Entities.Tournament> GetTournament(Guid id)
         {
-            var result = await _tournamentContext.Tournament.SingleOrDefaultAsync(x => x.Id == id);
-
-            if (result != null)
-            {
-                await _tournamentContext.Entry(result).Collection(x => x.Participants).LoadAsync();
-            }
+            var result = await _tournamentContext.Tournament.Include(x => x.Participants).SingleOrDefaultAsync(x => x.Id == id);
 
             return result;
         }
 
         public async Task<ICollection<Entities.Tournament>> GetTournaments()
         {
-            var result = await _tournamentContext.Tournament.ToListAsync();
+            var result = await _tournamentContext.Tournament.Include(x=>x.Participants).ToListAsync();
             return result;
         }
 
