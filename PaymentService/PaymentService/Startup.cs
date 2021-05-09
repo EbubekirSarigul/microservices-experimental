@@ -5,12 +5,17 @@ using MicroserviceTraining.Framework.IntegrationEvents.ConfigurationExtensions;
 using MicroserviceTraining.Framework.IOC;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Payment.Core.BackgroundServices;
+using Payment.Core.Commands.Payment;
+using Payment.Core.DomainEventHandlers;
 using Payment.Core.IntegrationEventHandlers;
+using Player.Data.Context;
+using Player.Data.Repositories;
 
 namespace PaymentService
 {
@@ -26,10 +31,23 @@ namespace PaymentService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            string connString = Configuration.GetConnectionString("MySqlConnStr");
+
+            var dbContextOptions = new DbContextOptionsBuilder<PaymentContext>()
+                                                                .UseMySql(connString, ServerVersion.AutoDetect(connString))
+                                                                .UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll).Options;
+
+            IocFacility.Container.Register(Component.For<PaymentContext>().LifestyleTransient());
+            IocFacility.Container.Register(Component.For(typeof(DbContextOptions<PaymentContext>)).Instance(dbContextOptions).LifestyleSingleton());
+
             IocFacility.Container
                 .AddMediaTR()
                 .AddKafka(Configuration);
 
+            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(PaymentCommand)).BasedOn(typeof(IRequestHandler<,>)).WithServiceAllInterfaces().LifestyleTransient());
+            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(PaymentCompletedDomainEventHandler)).BasedOn(typeof(INotificationHandler<>)).LifestyleTransient());
+
+            services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddHostedService<EventConsumerService>();
 
             IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(CheckoutIntegrationEventHandler)).BasedOn(typeof(INotificationHandler<>)).LifestyleTransient());

@@ -1,5 +1,7 @@
-﻿using MicroserviceTraining.Framework.IntegrationEvents.Abstractions;
+﻿using Basket.Core.Models;
+using MicroserviceTraining.Framework.IntegrationEvents.Abstractions;
 using System;
+using System.Collections.Generic;
 
 namespace Basket.Core.IntegrationEvents
 {
@@ -9,10 +11,16 @@ namespace Basket.Core.IntegrationEvents
 
         public Guid PaymentId { get; }
 
-        public CheckoutIntegrationEvent(int totalPrice)
+        public Guid PlayerId { get; }
+
+        public List<Tournament> Tournaments { get; }
+
+        public CheckoutIntegrationEvent(int totalPrice, Guid playerId, List<Tournament> tournaments)
         {
             TotalPrice = totalPrice;
+            PlayerId = playerId;
             PaymentId = Guid.NewGuid();
+            Tournaments = tournaments;
         }
     }
 }

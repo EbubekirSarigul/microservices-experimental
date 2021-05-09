@@ -10,6 +10,7 @@
         public const string EventTopic_TournamentDateChanged = "TournamentDateChanged";
         public const string EventTopic_TournamentPriceChanged = "TournamentPriceChanged";
         public const string EventTopic_CheckoutAccepted = "CheckoutAccepted";
+        public const string EventTopic_PaymentCompleted = "PaymentCompleted";
 
         public const int MinRatingForTournamentInforming = 2000;
     }

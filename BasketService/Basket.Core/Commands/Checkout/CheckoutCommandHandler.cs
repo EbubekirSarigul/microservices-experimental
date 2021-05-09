@@ -4,6 +4,7 @@ using MediatR;
 using MicroserviceTraining.Framework.Constants;
 using MicroserviceTraining.Framework.ExceptionMiddleware;
 using MicroserviceTraining.Framework.IntegrationEvents.Services;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,7 +31,7 @@ namespace Basket.Core.Commands.Checkout
                 throw new BusinessException("NO_BASKET", "Basket cannot be found.", System.Net.HttpStatusCode.BadRequest);
             }
 
-            CheckoutIntegrationEvent integrationEvent = new CheckoutIntegrationEvent(basket.Tournament.Sum(x => x.Price));
+            CheckoutIntegrationEvent integrationEvent = new CheckoutIntegrationEvent(basket.Tournament.Sum(x => x.Price), Guid.Parse(request.PlayerId), basket.Tournament);
             await _integrationEventService.PublishEventAsync(integrationEvent, Constant.EventTopic_CheckoutAccepted);
 
             return new CheckoutResult
