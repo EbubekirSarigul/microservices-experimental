@@ -24,10 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Player.Core\Player.Core.csproj" />
     <ProjectReference Include="..\Player.Data\Player.Data.csproj" />
   </ItemGroup>

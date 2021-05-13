@@ -10,5 +10,7 @@ namespace Player.Data.Repositories
         Task<ICollection<Player.Data.Entities.Player>> GetPlayersByMinimumRating(int minRating);
 
         Task<ICollection<Player.Data.Entities.Player>> GetPlayersByIdList(IEnumerable<Guid> playerIds);
+
+        Task<Player.Data.Entities.Player> AddPlayer(Player.Data.Entities.Player player);
     }
 }

@@ -19,6 +19,8 @@ using Microsoft.EntityFrameworkCore;
 using Player.Data.Repositories;
 using Player.Core.BackgroundServices;
 using MicroserviceTraining.Framework.IntegrationEvents.EventBuses.Kafka;
+using Player.Core.Commands.Register;
+using FluentValidation;
 
 namespace PlayerService
 {
@@ -37,20 +39,22 @@ namespace PlayerService
             string connString = Configuration.GetConnectionString("MySqlConnStr");
             var dbContextOptions = new DbContextOptionsBuilder<PlayerContext>()
                                                                 .UseMySql(connString, ServerVersion.AutoDetect(connString))
-                                                                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking).Options;
+                                                                .UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll).Options;
 
-            IocFacility.Container.Register(Component.For<PlayerContext>().LifestyleScoped());
+            IocFacility.Container.Register(Component.For<PlayerContext>().LifestyleTransient());
             IocFacility.Container.Register(Component.For(typeof(DbContextOptions<PlayerContext>)).Instance(dbContextOptions).LifestyleSingleton());
 
             IocFacility.Container
                 .AddMediaTR()
                 .AddKafka(Configuration);
 
+            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(RegisterCommand)).BasedOn(typeof(IRequestHandler<,>)).WithServiceAllInterfaces().LifestyleTransient());
             IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(NewTournamentAddedIntegrationEventHandler)).BasedOn(typeof(INotificationHandler<>)).LifestyleTransient());
 
             IocFacility.Container.Register(Component.For<ISmsProvider>().ImplementedBy<MockSmsProvider>().LifestyleTransient());
-            IocFacility.Container.Register(Component.For<IPlayerRepository>().ImplementedBy<PlayerRepository>().LifestyleScoped());
+            IocFacility.Container.Register(Component.For<IPlayerRepository>().ImplementedBy<PlayerRepository>().LifestyleTransient());
 
+            services.AddTransient<IValidator<RegisterCommand>, RegisterCommandValidation>();
             services.AddHostedService<EventConsumerService>();
 
             services.AddControllers();
@@ -58,6 +62,8 @@ namespace PlayerService
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "PlayerService", Version = "v1" });
             });
+
+            services.AddWindsor();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -69,6 +75,8 @@ namespace PlayerService
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PlayerService v1"));
             }
+
+            app.ConfigureAll();
 
             app.UseHttpsRedirection();
 

@@ -34,5 +34,11 @@ namespace Player.Data.Repositories
         {
             return await _playerContext.Players.Where(x => playerIds.Contains(x.Id)).ToListAsync();
         }
+
+        public async Task<Entities.Player> AddPlayer(Entities.Player player)
+        {
+            var result = await _playerContext.AddAsync(player);
+            return result.Entity;
+        }
     }
 }

@@ -49,7 +49,7 @@ namespace Tournament.Data.Entities
         {
             if (date != Date)
             {
-                var playerList = Participants.Select(x => x.Id);
+                var playerList = Participants.Select(x => x.PlayerId);
                 AddDomainEvent(new TournamentDateChangedDomainEvent(Name, date, playerList));
             }
 

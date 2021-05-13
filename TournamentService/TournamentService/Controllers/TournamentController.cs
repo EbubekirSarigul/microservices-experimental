@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using Tournament.Core.Commands;
 using Tournament.Core.Commands.CreateTournament;
 using Tournament.Core.Commands.UpdateTournament;
 using Tournament.Core.Queries;
