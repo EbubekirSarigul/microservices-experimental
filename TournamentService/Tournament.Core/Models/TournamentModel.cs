@@ -16,14 +16,11 @@ namespace Tournament.Core.Models
 
         public string Address { get; set; }
 
-        public ICollection<ParticipantModel> Participants { get; set; }
-
         public class TournamentProfile : Profile
         {
             public TournamentProfile()
             {
                 CreateMap<Entities.Tournament, TournamentModel>();
-                CreateMap<Entities.Participant, ParticipantModel>();
             }
         }
     }

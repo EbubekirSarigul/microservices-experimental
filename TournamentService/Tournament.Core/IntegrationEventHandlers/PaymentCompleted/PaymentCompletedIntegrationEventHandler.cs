@@ -17,15 +17,9 @@ namespace Tournament.Core.IntegrationEventHandlers.PaymentCompleted
 
         public async Task Handle(PaymentCompletedIntegrationEvent notification, CancellationToken cancellationToken)
         {
-            //var tournaments = await _tournamentRepository.GetTournaments(notification.Tournaments);
+            var tournaments = await _tournamentRepository.GetTournaments(notification.Tournaments);
 
-            //tournaments.ForEach(x => x.AddParticipant(notification.PlayerId));
-
-            //await _tournamentRepository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
-
-            var tournaments = await _tournamentRepository.GetTournament(notification.Tournaments[0]);
-
-            tournaments.AddParticipant(notification.PlayerId);
+            tournaments.ForEach(x => x.AddParticipant(notification.PlayerId));
 
             await _tournamentRepository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
         }

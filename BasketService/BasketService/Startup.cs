@@ -14,6 +14,8 @@ using FluentValidation;
 using StackExchange.Redis;
 using MicroserviceTraining.Framework.IntegrationEvents.ConfigurationExtensions;
 using Basket.Core.Commands.Checkout;
+using Basket.Core.IntegrationEventHandlers.PaymentCompleted;
+using Basket.Core.BackgroundServices;
 
 namespace BasketService
 {
@@ -36,10 +38,12 @@ namespace BasketService
             IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(AddItemCommand)).BasedOn(typeof(IRequestHandler<,>)).WithServiceAllInterfaces().LifestyleTransient());
             IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(CheckoutCommand)).BasedOn(typeof(IRequestHandler<,>)).WithServiceAllInterfaces().LifestyleTransient());
             IocFacility.Container.Register(Component.For<IBasketRepository>().ImplementedBy<BasketRepository>().LifestyleTransient());
+            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(PaymentCompletedIntegrationEventHandler)).BasedOn(typeof(INotificationHandler<>)).LifestyleTransient());
 
             services.AddRedis(Configuration);
             services.AddTransient<IValidator<AddItemCommand>, AddItemCommandValidation>();
             services.AddTransient<IValidator<CheckoutCommand>, CheckoutCommandValidation>();
+            services.AddHostedService<EventConsumerService>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
