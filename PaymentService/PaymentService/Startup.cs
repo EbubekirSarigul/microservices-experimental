@@ -31,20 +31,13 @@ namespace PaymentService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            string connString = Configuration.GetConnectionString("MySqlConnStr");
-
-            var dbContextOptions = new DbContextOptionsBuilder<PaymentContext>()
-                                                                .UseMySql(connString, ServerVersion.AutoDetect(connString))
-                                                                .UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll).Options;
-
-            IocFacility.Container.Register(Component.For<PaymentContext>().LifestyleTransient());
-            IocFacility.Container.Register(Component.For(typeof(DbContextOptions<PaymentContext>)).Instance(dbContextOptions).LifestyleSingleton());
-
             IocFacility.Container
                 .AddMediaTR("Payment.Core")
-                .AddKafka(Configuration);
+                .AddKafka(Configuration)
+                .AddMySqlContext<PaymentContext>(Configuration);
 
-            services.AddScoped<IPaymentRepository, PaymentRepository>();
+            IocFacility.Container.Register(Component.For<IPaymentRepository>().ImplementedBy<PaymentRepository>().LifestyleScoped());
+
             services.AddHostedService<EventConsumerService>();
 
             services.AddControllers();

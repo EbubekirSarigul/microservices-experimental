@@ -36,20 +36,13 @@ namespace PlayerService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            string connString = Configuration.GetConnectionString("MySqlConnStr");
-            var dbContextOptions = new DbContextOptionsBuilder<PlayerContext>()
-                                                                .UseMySql(connString, ServerVersion.AutoDetect(connString))
-                                                                .UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll).Options;
-
-            IocFacility.Container.Register(Component.For<PlayerContext>().LifestyleTransient());
-            IocFacility.Container.Register(Component.For(typeof(DbContextOptions<PlayerContext>)).Instance(dbContextOptions).LifestyleSingleton());
-
             IocFacility.Container
                 .AddMediaTR("Player.Core")
-                .AddKafka(Configuration);
+                .AddKafka(Configuration)
+                .AddMySqlContext<PlayerContext>(Configuration);
 
             IocFacility.Container.Register(Component.For<ISmsProvider>().ImplementedBy<MockSmsProvider>().LifestyleTransient());
-            IocFacility.Container.Register(Component.For<IPlayerRepository>().ImplementedBy<PlayerRepository>().LifestyleTransient());
+            IocFacility.Container.Register(Component.For<IPlayerRepository>().ImplementedBy<PlayerRepository>().LifestyleScoped());
 
             services.AddHostedService<EventConsumerService>();
 

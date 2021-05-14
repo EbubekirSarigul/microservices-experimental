@@ -30,21 +30,14 @@ namespace TournamentService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            string connString = Configuration.GetConnectionString("MySqlConnStr");
-
-            var dbContextOptions = new DbContextOptionsBuilder<TournamentContext>()
-                                                                .UseMySql(connString, ServerVersion.AutoDetect(connString))
-                                                                .UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll).Options;
-
-            IocFacility.Container.Register(Component.For<TournamentContext>().LifestyleScoped());
-            IocFacility.Container.Register(Component.For(typeof(DbContextOptions<TournamentContext>)).Instance(dbContextOptions).LifestyleSingleton());
-
             IocFacility.Container
                             .AddMediaTR("Tournament.Core")
                             .AddKafka(Configuration)
-                            .AddAutoMapper("Tournament.Core");
+                            .AddAutoMapper("Tournament.Core")
+                            .AddMySqlContext<TournamentContext>(Configuration);
 
-            services.AddScoped<ITournamentRepository, TournamentRepository>();
+            IocFacility.Container.Register(Component.For<ITournamentRepository>().ImplementedBy<TournamentRepository>().LifestyleScoped());
+
             services.AddHostedService<EventConsumerService>();
 
             services.AddControllers();

@@ -12,6 +12,7 @@ using MicroserviceTraining.Framework.IOC.Filters;
 using MicroserviceTraining.Framework.Middleware;
 using MicroserviceTraining.Framework.Models;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -106,6 +107,20 @@ namespace MicroserviceTraining.Framework.ConfigurationExtensions
             });
 
             return services;
+        }
+
+        public static IWindsorContainer AddMySqlContext<TDbContext>(this IWindsorContainer container, IConfiguration configuration) where TDbContext: DbContext
+        {
+            string connString = configuration.GetConnectionString("MySqlConnStr");
+
+            var dbContextOptions = new DbContextOptionsBuilder<TDbContext>()
+                                                                .UseMySql(connString, ServerVersion.AutoDetect(connString))
+                                                                .UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll).Options;
+
+            container.Register(Component.For<TDbContext>().LifestyleScoped());
+            container.Register(Component.For(typeof(DbContextOptions<TDbContext>)).Instance(dbContextOptions).LifestyleSingleton());
+
+            return container;
         }
     }
 }
