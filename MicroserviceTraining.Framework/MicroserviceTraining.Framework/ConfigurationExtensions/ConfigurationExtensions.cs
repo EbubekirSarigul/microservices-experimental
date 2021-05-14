@@ -9,6 +9,7 @@ using MicroserviceTraining.Framework.Behaviors;
 using MicroserviceTraining.Framework.ExceptionMiddleware;
 using MicroserviceTraining.Framework.IOC;
 using MicroserviceTraining.Framework.IOC.Filters;
+using MicroserviceTraining.Framework.Middleware;
 using MicroserviceTraining.Framework.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -70,6 +71,7 @@ namespace MicroserviceTraining.Framework.ConfigurationExtensions
         public static IApplicationBuilder ConfigureAll(this IApplicationBuilder applicationBuilder)
         {
             applicationBuilder.UseMiddleware<ExceptionHandler>();
+            applicationBuilder.UseMiddleware<ApiRequestMiddleware>();
 
             return applicationBuilder;
         }
