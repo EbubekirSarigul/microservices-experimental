@@ -45,16 +45,12 @@ namespace PlayerService
             IocFacility.Container.Register(Component.For(typeof(DbContextOptions<PlayerContext>)).Instance(dbContextOptions).LifestyleSingleton());
 
             IocFacility.Container
-                .AddMediaTR()
+                .AddMediaTR("Player.Core")
                 .AddKafka(Configuration);
-
-            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(RegisterCommand)).BasedOn(typeof(IRequestHandler<,>)).WithServiceAllInterfaces().LifestyleTransient());
-            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(NewTournamentAddedIntegrationEventHandler)).BasedOn(typeof(INotificationHandler<>)).LifestyleTransient());
 
             IocFacility.Container.Register(Component.For<ISmsProvider>().ImplementedBy<MockSmsProvider>().LifestyleTransient());
             IocFacility.Container.Register(Component.For<IPlayerRepository>().ImplementedBy<PlayerRepository>().LifestyleTransient());
 
-            services.AddTransient<IValidator<RegisterCommand>, RegisterCommandValidation>();
             services.AddHostedService<EventConsumerService>();
 
             services.AddControllers();

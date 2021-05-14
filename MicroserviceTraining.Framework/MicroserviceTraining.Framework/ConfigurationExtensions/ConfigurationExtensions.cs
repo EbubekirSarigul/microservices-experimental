@@ -6,7 +6,6 @@ using Castle.Windsor.MsDependencyInjection;
 using FluentValidation;
 using MediatR;
 using MicroserviceTraining.Framework.Behaviors;
-using MicroserviceTraining.Framework.Commands;
 using MicroserviceTraining.Framework.ExceptionMiddleware;
 using MicroserviceTraining.Framework.IOC;
 using MicroserviceTraining.Framework.IOC.Filters;
@@ -31,12 +30,15 @@ namespace MicroserviceTraining.Framework.ConfigurationExtensions
             return services;
         }
 
-        public static IWindsorContainer AddMediaTR(this IWindsorContainer container)
+        public static IWindsorContainer AddMediaTR(this IWindsorContainer container, string assemblyName = "")
         {
+            var assembly = Assembly.Load(assemblyName);
+
             container.Kernel.Resolver.AddSubResolver(new CollectionResolver(container.Kernel));
             container.Kernel.AddHandlersFilter(new ContravariantFilter());
 
-            container.Register(Classes.FromAssemblyContaining(typeof(BaseCommand<>)).BasedOn(typeof(IRequestHandler<,>)).WithServiceAllInterfaces().LifestyleTransient());
+            container.Register(Classes.FromAssembly(assembly).BasedOn(typeof(IRequestHandler<,>)).WithServiceAllInterfaces().LifestyleTransient());
+            container.Register(Classes.FromAssembly(assembly).BasedOn(typeof(INotificationHandler<>)).WithServiceAllInterfaces().LifestyleTransient());
             container.Register(Component.For<IMediator>().ImplementedBy<Mediator>());
             container.Register(Component.For<ServiceFactory>().UsingFactoryMethod<ServiceFactory>(k => (type =>
             {
@@ -49,12 +51,11 @@ namespace MicroserviceTraining.Framework.ConfigurationExtensions
             })));
 
             //register validators
-            AssemblyScanner.FindValidatorsInAssembly(typeof(BaseCommand<>).Assembly)
+            AssemblyScanner.FindValidatorsInAssembly(assembly)
                                 .ForEach(item => container.Register(Component.For(item.InterfaceType).ImplementedBy(item.ValidatorType).LifestyleTransient()));
 
-            container.Register(Component.For(typeof(IPipelineBehavior<,>)).ImplementedBy(typeof(HandlerLogging<,>)));
-            container.Register(Component.For(typeof(IPipelineBehavior<,>)).ImplementedBy(typeof(HandlerValidation<,>)));
-            //container.Register(Component.For(typeof(IPipelineBehavior<,>)).ImplementedBy(typeof(HandlerTransaction<,>)));
+            container.Register(Component.For(typeof(IPipelineBehavior<,>)).ImplementedBy(typeof(HandlerLogging<,>)).LifestyleTransient());
+            container.Register(Component.For(typeof(IPipelineBehavior<,>)).ImplementedBy(typeof(HandlerValidation<,>)).LifestyleTransient());
 
             return container;
         }
@@ -73,8 +74,10 @@ namespace MicroserviceTraining.Framework.ConfigurationExtensions
             return applicationBuilder;
         }
 
-        public static IWindsorContainer AddAutoMapper(this IWindsorContainer container, Assembly assembly)
+        public static IWindsorContainer AddAutoMapper(this IWindsorContainer container, string assemblyName = "")
         {
+            var assembly = Assembly.Load(assemblyName);
+
             container.Register(Classes.FromAssemblyInThisApplication(assembly).BasedOn<Profile>().WithServiceBase());
             container.Register(Component.For<AutoMapper.IConfigurationProvider>().UsingFactoryMethod(kernel =>
             {

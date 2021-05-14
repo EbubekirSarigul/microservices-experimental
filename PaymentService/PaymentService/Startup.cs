@@ -41,16 +41,11 @@ namespace PaymentService
             IocFacility.Container.Register(Component.For(typeof(DbContextOptions<PaymentContext>)).Instance(dbContextOptions).LifestyleSingleton());
 
             IocFacility.Container
-                .AddMediaTR()
+                .AddMediaTR("Payment.Core")
                 .AddKafka(Configuration);
-
-            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(PaymentCommand)).BasedOn(typeof(IRequestHandler<,>)).WithServiceAllInterfaces().LifestyleTransient());
-            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(PaymentCompletedDomainEventHandler)).BasedOn(typeof(INotificationHandler<>)).LifestyleTransient());
 
             services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddHostedService<EventConsumerService>();
-
-            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(CheckoutIntegrationEventHandler)).BasedOn(typeof(INotificationHandler<>)).LifestyleTransient());
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

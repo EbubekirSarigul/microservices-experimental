@@ -33,16 +33,11 @@ namespace BasketService
         {
             IocFacility.Container
                 .AddKafka(Configuration)
-                .AddMediaTR();
+                .AddMediaTR("Basket.Core");
 
-            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(AddItemCommand)).BasedOn(typeof(IRequestHandler<,>)).WithServiceAllInterfaces().LifestyleTransient());
-            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(CheckoutCommand)).BasedOn(typeof(IRequestHandler<,>)).WithServiceAllInterfaces().LifestyleTransient());
             IocFacility.Container.Register(Component.For<IBasketRepository>().ImplementedBy<BasketRepository>().LifestyleTransient());
-            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(PaymentCompletedIntegrationEventHandler)).BasedOn(typeof(INotificationHandler<>)).LifestyleTransient());
 
             services.AddRedis(Configuration);
-            services.AddTransient<IValidator<AddItemCommand>, AddItemCommandValidation>();
-            services.AddTransient<IValidator<CheckoutCommand>, CheckoutCommandValidation>();
             services.AddHostedService<EventConsumerService>();
 
             services.AddControllers();

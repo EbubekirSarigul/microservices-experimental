@@ -1,5 +1,4 @@
 using Castle.MicroKernel.Registration;
-using FluentValidation;
 using MediatR;
 using MicroserviceTraining.Framework.ConfigurationExtensions;
 using MicroserviceTraining.Framework.IntegrationEvents.ConfigurationExtensions;
@@ -12,12 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Tournament.Core.BackgroundServices;
-using Tournament.Core.Commands.CreateTournament;
-using Tournament.Core.Commands.UpdateTournament;
 using Tournament.Core.DomainEventHandlers;
 using Tournament.Core.IntegrationEventHandlers.PaymentCompleted;
-using Tournament.Core.Models;
-using Tournament.Core.Queries;
 using Tournament.Data.Context;
 using Tournament.Data.Repositories;
 
@@ -45,20 +40,11 @@ namespace TournamentService
             IocFacility.Container.Register(Component.For(typeof(DbContextOptions<TournamentContext>)).Instance(dbContextOptions).LifestyleSingleton());
 
             IocFacility.Container
-                            .AddMediaTR()
+                            .AddMediaTR("Tournament.Core")
                             .AddKafka(Configuration)
-                            .AddAutoMapper(typeof(TournamentModel).Assembly);
-
-            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(CreateTournamentCommand)).BasedOn(typeof(IRequestHandler<,>)).WithServiceAllInterfaces().LifestyleTransient());
-            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(GetTournamentsQuery)).BasedOn(typeof(IRequestHandler<,>)).WithServiceAllInterfaces().LifestyleTransient());
-            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(NewTournamentAddedDomainEventHandler)).BasedOn(typeof(INotificationHandler<>)).LifestyleTransient());
-            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(TournamentDateChangedDomainEventHandler)).BasedOn(typeof(INotificationHandler<>)).LifestyleTransient());
-            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(TournamentEntryPriceChangedDomainEventHandler)).BasedOn(typeof(INotificationHandler<>)).LifestyleTransient());
-            IocFacility.Container.Register(Classes.FromAssemblyContaining(typeof(PaymentCompletedIntegrationEventHandler)).BasedOn(typeof(INotificationHandler<>)).LifestyleTransient());
+                            .AddAutoMapper("Tournament.Core");
 
             services.AddScoped<ITournamentRepository, TournamentRepository>();
-            services.AddTransient<IValidator<CreateTournamentCommand>, CreateTournamentCommandValidation>();
-            services.AddTransient<IValidator<UpdateTournamentCommand>, UpdateTournamentCommandValidation>();
             services.AddHostedService<EventConsumerService>();
 
             services.AddControllers();
