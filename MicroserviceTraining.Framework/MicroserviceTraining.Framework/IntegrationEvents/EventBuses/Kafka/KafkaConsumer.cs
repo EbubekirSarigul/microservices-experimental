@@ -28,7 +28,7 @@ namespace MicroserviceTraining.Framework.IntegrationEvents.EventBuses.Kafka
             ConsumerConfig consumerConfig = new ConsumerConfig
             {
                 BootstrapServers = configuration.Servers,
-                GroupId = Guid.NewGuid().ToString("N"), // todo
+                GroupId = configuration.ConsumerGroupId,
                 AutoOffsetReset = AutoOffsetReset.Latest,
                 Acks = Acks.Leader
             };
