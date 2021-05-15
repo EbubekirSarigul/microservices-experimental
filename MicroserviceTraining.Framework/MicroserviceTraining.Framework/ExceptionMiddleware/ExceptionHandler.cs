@@ -1,5 +1,6 @@
 ﻿using MicroserviceTraining.Framework.Extensions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
 using System.Threading.Tasks;
@@ -8,10 +9,12 @@ namespace MicroserviceTraining.Framework.ExceptionMiddleware
 {
     public class ExceptionHandler
     {
+        private readonly ILogger<ExceptionHandler> _logger;
         private readonly RequestDelegate _next;
 
-        public ExceptionHandler(RequestDelegate next)
+        public ExceptionHandler(ILogger<ExceptionHandler> logger, RequestDelegate next)
         {
+            _logger = logger;
             _next = next;
         }
 
@@ -23,16 +26,19 @@ namespace MicroserviceTraining.Framework.ExceptionMiddleware
             }
             catch (BusinessException businessException)
             {
+                _logger.LogError($"Business exception: Code:{businessException._errorCode}, Message:{businessException._errorMessage}, Http status: {businessException._statusCode}");
                 var exception = CreateExceptionModel(businessException._errorCode, businessException._errorMessage);
                 await WriteException(httpContext, exception, httpStatusCode: businessException._statusCode);
             }
             catch (InputException validationException)
             {
+                _logger.LogError($"Validation exception: {validationException._validationErrors.ToJson()}");
                 var exception = CreateExceptionModel(validationException);
                 await WriteException(httpContext, exception, HttpStatusCode.BadRequest);
             }
             catch (Exception ex)
             {
+                _logger.LogCritical($"Unhandled exception: {ex.ToString()}");
                 var exception = CreateExceptionModel("SERVER_ERROR", "Unknown error");
                 await WriteException(httpContext, exception);
             }

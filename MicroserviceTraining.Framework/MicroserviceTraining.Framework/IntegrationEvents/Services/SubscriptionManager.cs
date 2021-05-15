@@ -1,5 +1,6 @@
 ﻿using MicroserviceTraining.Framework.Constants;
 using MicroserviceTraining.Framework.IntegrationEvents.Abstractions;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,15 +12,19 @@ namespace MicroserviceTraining.Framework.IntegrationEvents.Services
     {
         readonly ConcurrentBag<string> _topics;
         readonly ConcurrentDictionary<string, Type> _eventTypes;
+        private readonly ILogger<SubscriptionManager> _logger;
 
-        public SubscriptionManager()
+        public SubscriptionManager(ILogger<SubscriptionManager> logger)
         {
             _topics = new ConcurrentBag<string>();
             _eventTypes = new ConcurrentDictionary<string, Type>();
+            _logger = logger;
         }
 
         public void Subscribe<TEvent>(string topic) where TEvent : IntegrationEvent
         {
+            _logger.LogInformation($"Subscribing to {topic}. Event: {typeof(TEvent).Name}");
+
             string key = Constant.IntegrationEventPrefix + topic;
             _topics.Add(topic);
             _eventTypes.TryAdd(key, typeof(TEvent));

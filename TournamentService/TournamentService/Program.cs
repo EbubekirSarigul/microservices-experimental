@@ -1,6 +1,7 @@
 using MicroserviceTraining.Framework.ConfigurationExtensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using System.Diagnostics;
 
 namespace TournamentService
 {
@@ -8,6 +9,7 @@ namespace TournamentService
     {
         public static void Main(string[] args)
         {
+            Serilog.Debugging.SelfLog.Enable(msg => Debug.WriteLine(msg));
             CreateHostBuilder(args).Build().Run();
         }
 

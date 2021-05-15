@@ -2,13 +2,12 @@
 using Confluent.Kafka;
 using MediatR;
 using MicroserviceTraining.Framework.Constants;
+using MicroserviceTraining.Framework.Extensions;
 using MicroserviceTraining.Framework.IntegrationEvents.Abstractions;
 using MicroserviceTraining.Framework.IOC;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
-using System.Diagnostics;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,10 +19,12 @@ namespace MicroserviceTraining.Framework.IntegrationEvents.EventBuses.Kafka
 
         public delegate Task MessageConsumedDelegate(string topic, Message<Null, string> message);
         public event MessageConsumedDelegate OnMessageConsumed;
+
+        private readonly ILogger<KafkaConsumer> _logger;
         private readonly ISubscriptionManager _subscriptionManager;
         private readonly IMediator _mediator;
 
-        public KafkaConsumer(KafkaConfiguration configuration, ISubscriptionManager subscriptionManager, IMediator mediator)
+        public KafkaConsumer(ILogger<KafkaConsumer> logger, KafkaConfiguration configuration, ISubscriptionManager subscriptionManager, IMediator mediator)
         {
             ConsumerConfig consumerConfig = new ConsumerConfig
             {
@@ -34,13 +35,15 @@ namespace MicroserviceTraining.Framework.IntegrationEvents.EventBuses.Kafka
             };
 
             _consumerConfig = consumerConfig;
-
+            _logger = logger;
             _subscriptionManager = subscriptionManager;
             _mediator = mediator;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
+            _logger.LogInformation($"Kafka consumer begins consuming.");
+
             OnMessageConsumed += EventMessageConsumed;
             await Consume(cancellationToken);
         }
@@ -52,6 +55,8 @@ namespace MicroserviceTraining.Framework.IntegrationEvents.EventBuses.Kafka
                 var _topics = _subscriptionManager.GetTopics();
                 consumer.Subscribe(_topics);
 
+                _logger.LogInformation($"Topics subscribed: {string.Join("' ", _topics)}");
+
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     try
@@ -61,8 +66,7 @@ namespace MicroserviceTraining.Framework.IntegrationEvents.EventBuses.Kafka
                     }
                     catch (Exception consumeException)
                     {
-                        //todo...
-                        string message = consumeException.ToString();
+                        _logger.LogCritical($"Unhandled exception while consuming events: {consumeException.ToString()}");
                         await Task.Delay(1000, cancellationToken);
                     }
                 }
@@ -75,19 +79,21 @@ namespace MicroserviceTraining.Framework.IntegrationEvents.EventBuses.Kafka
         {
             try
             {
+                _logger.LogDebug($"Event consumed. Topic: {topic}, Message: {message?.Value}");
+
                 string key = Constant.IntegrationEventPrefix + topic;
 
                 var eventType = _subscriptionManager.GetEventType(topic);
                 var @event = JsonConvert.DeserializeObject(message.Value, eventType);
 
-                using (IocFacility.Container.BeginScope()) // it is not a web request, so a scope should begin.
+                using (IocFacility.Container.BeginScope())
                 {
                     await _mediator.Publish(@event);
                 }
             }
             catch (Exception handlerException)
             {
-                //todo...
+                _logger.LogCritical($"Unhandled exception while proccessing consumed event: {handlerException.ToString()}");
             }
         }
     }

@@ -20,7 +20,7 @@ namespace MicroserviceTraining.Framework.Behaviors
 
             var response = await next();
 
-            _logger.LogInformation($"Handled {typeof(TResponse).Name}");
+            _logger.LogInformation($"Handled {typeof(TRequest).Name}");
 
             return response;
         }

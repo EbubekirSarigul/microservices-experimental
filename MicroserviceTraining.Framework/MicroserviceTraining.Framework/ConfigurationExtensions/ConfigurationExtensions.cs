@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 using StackExchange.Redis;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,6 +66,9 @@ namespace MicroserviceTraining.Framework.ConfigurationExtensions
         public static IHostBuilder ConfigureAll<TStartup>(this IHostBuilder host) where TStartup : class
         {
             host.UseServiceProviderFactory(new WindsorServiceProviderFactory());
+
+            host.UseSerilog((context, services, configuration) =>
+                                    configuration.ReadFrom.Configuration(context.Configuration));
 
             return host;
         }
