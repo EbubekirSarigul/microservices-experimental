@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ebubekir.MicroserviceTraining.Framework" Version="1.0.2" />
+    <PackageReference Include="Ebubekir.MicroserviceTraining.Framework" Version="1.0.3" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="9.5.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.4">

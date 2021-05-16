@@ -9,7 +9,7 @@
     <PackageReference Include="Castle.Windsor" Version="5.1.1" />
     <PackageReference Include="Castle.Windsor.MsDependencyInjection" Version="3.4.0" />
     <PackageReference Include="Confluent.Kafka" Version="1.6.3" />
-    <PackageReference Include="Ebubekir.MicroserviceTraining.Framework" Version="1.0.2" />
+    <PackageReference Include="Ebubekir.MicroserviceTraining.Framework" Version="1.0.3" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="9.5.3" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="9.5.3" />
     <PackageReference Include="MediatR" Version="9.0.0" />
