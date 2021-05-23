@@ -8,6 +8,8 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /src
 COPY ["BasketService/BasketService.csproj", "BasketService/"]
+COPY ["Basket.Core/Basket.Core.csproj", "Basket.Core/"]
+RUN dotnet nuget locals all --clear
 RUN dotnet restore "BasketService/BasketService.csproj"
 COPY . .
 WORKDIR "/src/BasketService"
