@@ -45,28 +45,28 @@ services:
       - 6379:6379
       
   basket:
-    image: x-basket-service:1.0
+    image: ebubekirsarigul/x-basket-service:1.0
     depends_on:
       - elasticsearch
     ports:
       - 44308:80
       
   payment:
-    image: x-payment-service:1.0
+    image: ebubekirsarigul/x-payment-service:1.0
     depends_on:
       - elasticsearch
     ports:
       - 59333:80
       
   tournament:
-    image: x-tournament-service:1.0
+    image: ebubekirsarigul/x-tournament-service:1.0
     depends_on:
       - elasticsearch
     ports:
       - 51000:80
       
   player:
-    image: x-player-service:1.0
+    image: ebubekirsarigul/x-player-service:1.0
     depends_on:
       - elasticsearch
     ports:
