@@ -24,6 +24,8 @@ services:
       
   elasticsearch:
     image: elasticsearch:7.12.1
+    volumes:
+      - data01:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
       - 9300:9300
@@ -48,3 +50,28 @@ services:
       - elasticsearch
     ports:
       - 44308:80
+      
+  payment:
+    image: x-payment-service:1.0
+    depends_on:
+      - elasticsearch
+    ports:
+      - 59333:80
+      
+  tournament:
+    image: x-tournament-service:1.0
+    depends_on:
+      - elasticsearch
+    ports:
+      - 51000:80
+      
+  player:
+    image: x-player-service:1.0
+    depends_on:
+      - elasticsearch
+    ports:
+      - 44322:80
+      
+volumes:
+  data01:
+    driver: local

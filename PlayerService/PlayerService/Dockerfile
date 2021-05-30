@@ -8,6 +8,9 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /src
 COPY ["PlayerService/PlayerService.csproj", "PlayerService/"]
+COPY ["Player.Core/Player.Core.csproj", "Player.Core/"]
+COPY ["Player.Data/Player.Data.csproj", "Player.Data/"]
+RUN dotnet nuget locals all --clear
 RUN dotnet restore "PlayerService/PlayerService.csproj"
 COPY . .
 WORKDIR "/src/PlayerService"

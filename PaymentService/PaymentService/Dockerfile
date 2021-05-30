@@ -8,6 +8,9 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /src
 COPY ["PaymentService/PaymentService.csproj", "PaymentService/"]
+COPY ["Payment.Core/Payment.Core.csproj", "Payment.Core/"]
+COPY ["Player.Data/Player.Data.csproj", "Player.Data/"]
+RUN dotnet nuget locals all --clear
 RUN dotnet restore "PaymentService/PaymentService.csproj"
 COPY . .
 WORKDIR "/src/PaymentService"

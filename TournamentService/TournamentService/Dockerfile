@@ -8,6 +8,9 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /src
 COPY ["TournamentService/TournamentService.csproj", "TournamentService/"]
+COPY ["Tournament.Core/Tournament.Core.csproj", "Tournament.Core/"]
+COPY ["Tournament.Data/Tournament.Data.csproj", "Tournament.Data/"]
+RUN dotnet nuget locals all --clear
 RUN dotnet restore "TournamentService/TournamentService.csproj"
 COPY . .
 WORKDIR "/src/TournamentService"
