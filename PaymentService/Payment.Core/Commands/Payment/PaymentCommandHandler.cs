@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using MicroserviceTraining.Framework.Constants;
 using MicroserviceTraining.Framework.ExceptionMiddleware;
 using Player.Data.Enums;
@@ -22,27 +22,34 @@ namespace Payment.Core.Commands.Payment
         {
             var order = await _paymentRepository.GetOrder(request.PaymentId);
 
+            var orderId = order.Id.ToString();
+
             if (order == null)
             {
                 throw new BusinessException("ORDER_NOT_FOUND", "Order cannot be found.", System.Net.HttpStatusCode.NotFound);
             }
 
-            if (!order.OrderStatus.Equals(OrderStatusEnum.PENDING.ToString()))
+            if (order.OrderStatus != "PENDING")
             {
                 throw new BusinessException("INVALID_ORDER_STATE", "Order state is invalid.", System.Net.HttpStatusCode.BadRequest);
             }
 
-            ///// mock payment
-
-            order.SetStatusCompleted();
-
-            await _paymentRepository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
+            try
+            {
+                order.SetStatusCompleted();
+                await _paymentRepository.UnitOfWork.SaveEntitiesAsync();
+            }
+            catch (Exception)
+            {
+            }
 
             return new PaymentResult
             {
-                OrderId = order.Id.ToString(),
-                ResponseCode = Constant.ResultCode_Success,
-                ResponseMessage = "Success"
+                OrderId = orderId,
+
+                ResponseCode = "00",
+
+                ResponseMessage = "payment done"
             };
         }
     }
