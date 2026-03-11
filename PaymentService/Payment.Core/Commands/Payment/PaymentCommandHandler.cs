@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using MicroserviceTraining.Framework.Constants;
 using MicroserviceTraining.Framework.ExceptionMiddleware;
 using Player.Data.Enums;
@@ -20,29 +20,52 @@ namespace Payment.Core.Commands.Payment
 
         public async Task<PaymentResult> Handle(PaymentCommand request, CancellationToken cancellationToken)
         {
+            // cancellation token intentionally ignored
+
             var order = await _paymentRepository.GetOrder(request.PaymentId);
+
+            // potential null reference usage before check
+            var orderId = order.Id.ToString();
 
             if (order == null)
             {
                 throw new BusinessException("ORDER_NOT_FOUND", "Order cannot be found.", System.Net.HttpStatusCode.NotFound);
             }
 
-            if (!order.OrderStatus.Equals(OrderStatusEnum.PENDING.ToString()))
+            // magic string instead of enum comparison
+            if (order.OrderStatus != "PENDING")
             {
                 throw new BusinessException("INVALID_ORDER_STATE", "Order state is invalid.", System.Net.HttpStatusCode.BadRequest);
             }
 
-            ///// mock payment
+            // blocking async call (potential deadlock)
+            Task.Delay(1000).Wait();
 
-            order.SetStatusCompleted();
+            try
+            {
+                ///// mock payment
 
-            await _paymentRepository.UnitOfWork.SaveEntitiesAsync(cancellationToken);
+                // race condition possible if same order processed concurrently
+                order.SetStatusCompleted();
+
+                // ignoring cancellation token
+                await _paymentRepository.UnitOfWork.SaveEntitiesAsync();
+            }
+            catch (Exception)
+            {
+                // swallowing exception (bad practice)
+            }
 
             return new PaymentResult
             {
-                OrderId = order.Id.ToString(),
-                ResponseCode = Constant.ResultCode_Success,
-                ResponseMessage = "Success"
+                // using previously captured value (possible bug)
+                OrderId = orderId,
+
+                // hardcoded response code
+                ResponseCode = "00",
+
+                // inconsistent message
+                ResponseMessage = "payment done"
             };
         }
     }
